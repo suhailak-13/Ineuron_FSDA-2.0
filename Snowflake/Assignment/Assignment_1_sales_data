@@ -1,0 +1,97 @@
+CREATE or REPLACE TABLE sa_sales_data_final
+(
+  order_id varchar2(25),
+  order_date date,
+  ship_date date,
+  ship_mode varchar2(50),
+  customer_name varchar2(50),
+  segment varchar2(50),
+  state varchar2(50),
+  COUNTry varchar2(80),
+  market varchar2(50),
+  region varchar2(50),
+  product_id varchar2(50),
+  category varchar2(50),
+  sub_category varchar2(50),
+  product_name varchar2(130),
+  sales integer,
+  quantity integer,
+  disCOUNT number(4,4),
+  profit number(10,5),
+  shipping_cost number(10,5),
+  order_priority varchar2(20),
+  year varchar2(4)
+);
+
+DESCRIBE TABLE sa_sales_data_final;
+
+SELECT COUNT(distinct order_id) FROM sa_sales_data_final;
+
+SELECT * FROM sa_sales_data_final limit 10;
+
+
+Question 2-
+ALTER TABLE sa_sales_data_final
+ADD primary key (order_id);
+
+CREATE or REPLACE TABLE sa_sales_data_final_copy  as 
+SELECT * FROM sa_sales_data_final ;
+
+SELECT * FROM sa_sales_data_final_copy limit 10;
+
+DESCRIBE TABLE sa_sales_data_final_copy;
+
+ALTER TABLE sa_sales_data_final_copy
+ADD primary key(order_id);
+
+
+
+Question 4-
+ALTER TABLE sa_sales_data_final_copy
+ADD COLUMN id_number varchar2(25);
+
+
+UPDATE sa_sales_data_final_copy
+SET id_number = (substr(order_id, 9)) ;
+
+
+
+
+Question 5-
+ALTER TABLE sa_sales_data_final_copy
+ADD COLUMN disCOUNT_flag varchar2(5);
+
+UPDATE sa_sales_data_final_copy
+set disCOUNT_flag = (
+    case
+            when disCOUNT > '0' then 'Yes'
+            else 'False'
+    end
+);
+
+
+Question 6-
+ALTER TABLE sa_sales_data_final_copy
+ADD COLUMN sa_days_taken integer;           
+
+update sa_sales_data_final_copy
+set sa_days_taken = (datediff('day', order_date,ship_date));
+
+
+
+Question 7-
+ALTER TABLE sa_sales_data_final_copy
+ADD COLUMN sa_flag_process_days integer;
+
+update sa_sales_data_final_copy
+set sa_flag_process_days = (
+    case
+        when sa_days_taken <= '3' then  '5'
+        when sa_days_taken <= '6' and sa_days_taken > '3'  then  '4'
+        when sa_days_taken <= '10' and sa_days_taken > '6'  then  '3'
+        else '2'
+    end);
+   
+SELECT *  FROM sa_sales_data_final_copy;
+
+
